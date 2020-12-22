@@ -5,21 +5,27 @@ body {
 body::-webkit-scrollbar {
     display: none;
 }
-.header {
+.footer, .header {
     background-color: #257AAA;
     color: white;
+    height: 8vh;
     width: 100%;
-    min-height: 60px;
     text-align: center;
-    padding-top: 20px;
     margin: unset;
     font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
 }
+.header {
+    align-self: center;
+    padding-top: 2vh;
+}
+.footer {
+    height: 4vh;
+}
 .chat-space {
     display: flex;
+    height: 86vh;
 }
 .chat-list {
-    height: 83vh;
     width: 40%;
     background-color: #EAF4FB;
     border-right: 2px solid teal;
@@ -27,7 +33,6 @@ body::-webkit-scrollbar {
     overflow-y: scroll;
 }
 .chat-active {
-    height: 83vh;
     width: 70%;
     background-color: #F4F5F7;
     display: flex;
