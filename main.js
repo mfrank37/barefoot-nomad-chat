@@ -1,5 +1,5 @@
-let TOKEN = 'visitor'; // for testing
-// TOKEN = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiZWZhY2U0M2MtMmU0OS00NzNiLWJiZTItMzA1ZDFhNTE5MGYxIiwidXNlcm5hbWUiOiJtZnJhbmszNyIsImlhdCI6MTYwOTUxOTcwMCwiZXhwIjoxNjEwMTI0NTAwfQ.b_gRE91TZAaTSTSkwGp798_KOq9PP6kbe7FIePvGQ6A';
+let TOKEN; // for testing
+TOKEN = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiZWZhY2U0M2MtMmU0OS00NzNiLWJiZTItMzA1ZDFhNTE5MGYxIiwidXNlcm5hbWUiOiJtZnJhbmszNyIsImlhdCI6MTYwOTUxOTcwMCwiZXhwIjoxNjEwMTI0NTAwfQ.b_gRE91TZAaTSTSkwGp798_KOq9PP6kbe7FIePvGQ6A';
 
 const socket = io('http://localhost:3000');
 
@@ -31,11 +31,14 @@ const sendMessage = (evt) => {
     document.querySelector('.messages').appendChild(sentMsg);
 }
 
-const sendIt = (message, TOKEN='visitor') => {
+const sendIt = (message) => {
+    let chat_from = 'mfrank37';
+    let chat_to = document.querySelector('#active-chatter .name').innerHTML;
     return {
         token:TOKEN,
-        message: message,
-        time : new Date()
+        chat_from: TOKEN ? chat_from : 'visitor',
+        chat_to: TOKEN ? chat_to :'BAREFOOT SUPPORT',
+        chat_message: message,
     }
 }
 
