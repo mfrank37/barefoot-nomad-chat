@@ -1,8 +1,10 @@
+const socket = io('http://localhost:3000');
+let serverURL = 'http://localhost:3000/api/v1';
 window.TOKEN; // for testing
 window.UserID;
-// TOKEN = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiZWZhY2U0M2MtMmU0OS00NzNiLWJiZTItMzA1ZDFhNTE5MGYxIiwidXNlcm5hbWUiOiJtZnJhbmszNyIsImlhdCI6MTYwOTUxOTcwMCwiZXhwIjoxNjEwMTI0NTAwfQ.b_gRE91TZAaTSTSkwGp798_KOq9PP6kbe7FIePvGQ6A';
-let serverURL = 'http://localhost:3000/api/v1';
 window.CREDENTIALS = {};
+
+/* Login */
 const login = (e) => {
     e.preventDefault();
     CREDENTIALS.email = e.target.email.value,
@@ -14,34 +16,33 @@ const login = (e) => {
         if(POST.status == 200) {
             console.log(POST.responseText);
             // POST.responseText.to
-            TOKEN = JSON.parse(POST.responseText.data);
-            UserID = JSON.parse(POST.responseText.profile.id);
+            RES = JSON.parse(POST.responseText);
+            console.log(RES);
+            UserID = RES.profile.id;
+            TOKEN = RES.data;
             console.log(TOKEN, UserID);
             e.target.remove();
         }
     };
-
     POST.send(JSON.stringify(CREDENTIALS));
 }
-
 const loginForm = document.querySelector('form.login');
 loginForm.addEventListener('submit', login);
 
-// const socket = io('http://localhost:3000');
+/* Send messages from User with his ID */
+socket.on('chat-message', data => {
+    console.log(data);
+});
+socket.on('new-connection' , msg => {
+    console.log(msg);
+});
 
-// socket.on('chat-message', data => {
-//     console.log(data);
-// });
 
-// socket.on('new-connection' , msg => {
-//     console.log(msg);
-// });
+socket.on('disconnected', msg => {
+    console.log(msg);
+});
 
-// socket.on('disconnected', msg => {
-//     console.log(msg);
-// });
-
-// const txtArea = document.querySelector('textarea');
+const txtArea = document.querySelector('textarea');
 
 const sendMessage = (evt) => {
     evt.preventDefault();
