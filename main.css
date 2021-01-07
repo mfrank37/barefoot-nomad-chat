@@ -141,3 +141,6 @@ form.login {
     justify-content: center;
     align-items: center;
 }
+#active-chatter {
+    background-color: #6660A0;
+}
