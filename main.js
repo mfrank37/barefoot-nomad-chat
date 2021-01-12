@@ -32,7 +32,7 @@ const login = async (e) => {
 }
 
 const getChatList = async (TOKEN) => {
-    const RESPONSE = await fetch(serverURL + '/chat/chatlist/me', {
+    const RESPONSE = await fetch(serverURL + '/chat/chatlist', {
         method: 'GET',
         mode: 'cors',
         headers: {
@@ -63,13 +63,12 @@ const pinUser = async (e) => {
     while(messagesDisplay.hasChildNodes()){
         messagesDisplay.firstChild.remove();
     }
-    const RESPONSE = await fetch(serverURL+'/chat/'+ ACTIVE_CHATTER.id, {
+    const RESPONSE = await fetch(serverURL+'/chat?id='+ACTIVE_CHATTER.id, {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json',
             'Authorization': 'Bearer ' + TOKEN
-        }
-    }).then(RES => RES.json());
+        }}).then(RES => RES.json());
     displayMessages(RESPONSE);
 }
 
@@ -83,7 +82,11 @@ const displayMessages = ({chats}) => {
         } else {
             chatItem.classList.add('received');
         }
-        chatItem.innerHTML = CHAT.message;
+        chatItem.innerHTML = CHAT.type === 'plain-text' ? CHAT.message 
+        : '<a target="_blank" href="' + CHAT.message + '" class="upload-file">FILE</a>';
+        if (CHAT.type !== 'plain-text') {
+            chatItem.innerHTML += 'type : ' + CHAT.type;
+        }
         messages.appendChild(chatItem);
     });
 }
@@ -91,14 +94,13 @@ const displayMessages = ({chats}) => {
 const listUsers = (LIST) => {
     let listView = document.querySelector('.chat-list');
     LIST.forEach( async (USER) => {
-        let { lastMessage } = await fetch(serverURL+'/chat/last/'+USER.id, {
+        let lastMessage = await fetch(serverURL+ '/chat/last?id='+USER.id, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
                 'Authorization': 'Bearer '+TOKEN
-            }
-        }).then(RES => RES.json());
-        console.log(lastMessage);
+            }}).then(RES => RES.json());
+            console.log(lastMessage);
         let chat = document.createElement('div');
         chat.classList.add('chat-item');
         chat.setAttribute('data-id', USER.id);
@@ -110,7 +112,11 @@ const listUsers = (LIST) => {
             <div class="name">
             ${USER.first_name + ' ' + USER.last_name}
             </div>
-            ${ lastMessage.sender == UserID ? '<span class="you">You: </span>' : '' }<span class="message"><i>${lastMessage.message}</i></span>
+            ${ 
+                lastMessage.sender == UserID ? '<span class="you">You: </span>' : '' 
+            }<span class="message"><i>${ 
+            lastMessage.type === 'plain-text' ? lastMessage.message : 'sent a file' 
+            }</i></span>
             </div>`;
         listView.appendChild(chat);
     });
@@ -120,17 +126,17 @@ const loginForm = document.querySelector('form.login');
 loginForm.addEventListener('submit', login);
 
 // /* Send messages from User with his ID */
-socket.on('chat-message', data => {
-    console.log(data);
-});
-socket.on('new-connection' , msg => {
-            console.log(msg);
-        });
+// socket.on('chat-message', data => {
+//     console.log(data);
+// });
+// socket.on('new-connection' , msg => {
+//             console.log(msg);
+//         });
 
 
-socket.on('disconnected', msg => {
-    console.log(msg);
-});
+// socket.on('disconnected', msg => {
+//     console.log(msg);
+// });
 
 
 const sendMessage = async (evt) => {
@@ -146,8 +152,8 @@ const sendMessage = async (evt) => {
             'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-            chat_message: message,
-            to: chatTo
+            message: message,
+            receiver: chatTo
         })
     }).then(RES => RES.json());
     txtArea.value = '';
@@ -162,3 +168,34 @@ const sendMessage = async (evt) => {
 const txtArea = document.querySelector('textarea');
 const form = document.querySelector('form.send');
 form.addEventListener('submit', sendMessage);
+
+const uploadFile = async (e) => {
+    console.log(e.target.files[0]);
+    const { name, type } = e.target.files[0];
+    console.log({name, type});
+    // then you can send    the message
+    let chatTo = document.querySelector('#active-chatter').getAttribute('data-id');
+    console.log('sending to ', chatTo);
+    let RESPONSE = await fetch(serverURL+'/chat', {
+        method: 'POST',
+        headers: {
+            'Authorization': 'Bearer '+TOKEN,
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            message: name,
+            receiver: chatTo,
+            type: type
+        })
+    }).then(RES => RES.json());
+    txtArea.focus();
+    // socket.emit('chat-private', sendIt(message, TOKEN));
+    let sentMsg = document.createElement('div');
+    sentMsg.classList.add('sent');
+    sentMsg.innerHTML = '<a target="_blank" href="' + await RESPONSE.message + '" class="file-upload">FILE</a>';
+    sentMsg.innerHTML += ' type : ' + await RESPONSE.type;
+    document.querySelector('.messages').appendChild(sentMsg);    
+};
+
+const file = document.querySelector('.file');
+file.addEventListener('change', uploadFile, false);

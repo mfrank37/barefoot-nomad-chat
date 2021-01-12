@@ -145,3 +145,17 @@ form.login {
 #active-chatter {
     background-color: #6660A0;
 }
+.file {
+    display: none;
+    /* width: 70px; */
+    background: #b8860b;
+    border-radius: 10px;
+    padding: 2px;
+    font-size: 10px;    
+}
+[for='file'] {
+    border-radius: 20px;
+    color: darkcyan;
+    border: 6px solid darkcyan;
+    font-weight: 900;
+}
